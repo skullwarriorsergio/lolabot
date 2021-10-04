@@ -15,13 +15,14 @@ var workbook = new Excel.Workbook();
 //-----------Code-----------
 bot.command("start", (ctx) => {
   Welcome(ctx)
+  ctx.reply(ctx.chat.id)
 });
 bot.command("lola", (ctx) => {
   Welcome(ctx)
 });
 // Cargas atrasadas segun fecha de entrega en el rate
 bot.command("delay", (ctx) => {
-  ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...").then(() =>{
+  ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...").then(() =>{
     bot.telegram.sendMessage(ctx.from.id,"Buscando cargas <b>atrasadas</b>. Espere por favor",{ parse_mode: 'HTML' }).then(() => { 
     workbook.xlsx.readFile("D:\\Usuarios\\Sergio\\WindowsFolders\\Desktop\\FamilyBussiness.xlsx")
     .then(function() {           
@@ -48,7 +49,7 @@ bot.command("delay", (ctx) => {
 
 //Cargas pendientes de pago por Factory / Broker
 bot.command("pending", (ctx) => {
-  ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...").then(() =>{
+  ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...").then(() =>{
     bot.telegram.sendMessage(ctx.from.id,"Buscando cargas <b>pendientes de pago</b>. Espere por favor...",{ parse_mode: 'HTML' }).then(() => {
     workbook.xlsx.readFile("D:\\Usuarios\\Sergio\\WindowsFolders\\Desktop\\FamilyBussiness.xlsx")
     .then(function() {      
@@ -70,7 +71,7 @@ bot.command("pending", (ctx) => {
 
 // Cargas en HOLD en el factory
 bot.command("hold", (ctx) => {
-  ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...").then(() =>{
+  ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...").then(() =>{
     bot.telegram.sendMessage(ctx.from.id,"Buscando cargas en <b>HOLD</b>. Espere por favor...",{ parse_mode: 'HTML' }).then(() => {
       workbook.xlsx.readFile("D:\\Usuarios\\Sergio\\WindowsFolders\\Desktop\\FamilyBussiness.xlsx")
       .then(function() {
@@ -143,6 +144,27 @@ bot.on('inline_query', (ctx) => {
     const result = []
     ctx.answerInlineQuery(result)
 })
+bot.catch((err) => {
+  console.log("bot error: ", err);
+  if (
+    err.code === 403 &&
+    err.description.includes("bot was blocked by the user")
+  ) {
+    bot.telegram.sendMessage(
+      -507850928,
+      "Oh oh! No me ha sido posible enviarte un mensaje privado.\n Podrías revisar tus ajustes de Seguridad y Privacidad? pues al parecer me encuentro en la lista de bloqueo.\nAdicionalmente puedes iniciar una conversación directa conmigo: @lolavatb_bot"
+    );
+  }
+  if (
+    err.code === 403 &&
+    err.description.includes("Forbidden: bot can't initiate conversation with a user")
+  ) {
+    bot.telegram.sendMessage(
+      -507850928,
+      "Oh oh! No me ha sido posible enviarte un mensaje privado.\n Podrías revisar tus ajustes de Seguridad y Privacidad? pues al parecer me encuentro en la lista de bloqueo.\nAdicionalmente puedes iniciar una conversación directa conmigo: @lolavatb_bot"
+    );
+  }
+});
   
 bot.launch()
   
