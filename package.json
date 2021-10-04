@@ -1,0 +1,26 @@
+{
+  "name": "lolabot",
+  "version": "1.0.0",
+  "description": "\"# lolabot\"",
+  "main": "app.js",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "exceljs": "^4.3.0",
+    "telegraf": "^4.4.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skullwarriorsergio/lolabot.git"
+  },
+  "author": "Sergio <skullwarrior.sergio@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skullwarriorsergio/lolabot/issues"
+  },
+  "homepage": "https://github.com/skullwarriorsergio/lolabot#readme"
+}
