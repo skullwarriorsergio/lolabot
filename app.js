@@ -13,7 +13,13 @@ bot = new Telegraf(process.env.token)
 //  Execute the downloaders
 download(process.env.excelfburl,process.env.excelfbfile)
 //  Start the loop
-timeoutExcelFamilyBussiness()
+function downloadLoop(){
+  setTimeout(function () {
+    download(process.env.excelfburl,process.env.excelfbfile)
+    if (!stoppingBot)
+    downloadLoop();
+  }, 500000)
+}
 
 bot.telegram.getMe().then((botInfo) => {
     bot.options.username = botInfo.username
