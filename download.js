@@ -9,7 +9,7 @@ function download(url, filePath)  {
   });
   request.end();
   file.on('finish', function(){
-    console.log('finished downloading file');
+    console.log('finished downloading '+ filePath);
     file.close()
   });
 }
