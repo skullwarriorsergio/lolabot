@@ -2,7 +2,7 @@ require("dotenv").config({ path: __dirname + "/.env" })
 const { Telegraf, Markup } = require("telegraf")
 const Excel = require('exceljs')
 const fs = require("fs")
-const {download, timeoutExcelFamilyBussiness} = require('./download')
+const {download} = require('./download')
 const fileExists = require('./fsHelpers')
 const { time } = require("console")
 var bot = null
