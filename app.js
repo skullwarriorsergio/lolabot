@@ -17,9 +17,11 @@ function downloadLoop(){
   setTimeout(function () {
     download(process.env.excelfburl,process.env.excelfbfile)
     if (!stoppingBot)
-    downloadLoop();
-  }, 500000)
+      downloadLoop();
+    else console.log("Loop stopped")
+  }, 12000) //500 000
 }
+downloadLoop()
 
 bot.telegram.getMe().then((botInfo) => {
     bot.options.username = botInfo.username
@@ -55,7 +57,9 @@ bot.command("delay", (ctx) => {
                   loadsDelayed.push(rowNumber)
               }
             });
-          }).then(() =>
+          })
+          .catch((err) => bot.telegram.sendMessage(ctx.from.id,"Un momento por favor, se están actualizando los datos"))
+          .then(() =>
           bot.telegram.sendMessage(ctx.from.id,"Se encontraron <b>" + loadsDelayed.length + "</b> cargas <b>atrasadas</b>. Obteniendo detalles...",{ parse_mode: 'HTML' })).then(() =>{
           loadsDelayed?.forEach(element => {
               const worksheet = workbook.getWorksheet('Loads')
@@ -85,6 +89,7 @@ bot.command("pending", (ctx) => {
     ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...")
     bot.telegram.sendMessage(ctx.from.id,"Buscando cargas <b>pendientes de pago</b>. Espere por favor...",{ parse_mode: 'HTML' }).then(() => {      
       workbook.xlsx.readFile(process.env.excelfbfile)
+      .catch((err) => bot.telegram.sendMessage(ctx.from.id,"Un momento por favor, se están actualizando los datos"))
       .then(function() {      
           var loads =""
           const worksheet = workbook.getWorksheet('Loads')
@@ -120,6 +125,7 @@ bot.command("hold", (ctx) => {
     ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...")
     bot.telegram.sendMessage(ctx.from.id,"Buscando cargas en <b>HOLD</b>. Espere por favor...",{ parse_mode: 'HTML' }).then(() => {      
       workbook.xlsx.readFile(process.env.excelfbfile)
+      .catch((err) => bot.telegram.sendMessage(ctx.from.id,"Un momento por favor, se están actualizando los datos"))
       .then(function() {
           loadsDelayed= []
           const worksheet = workbook.getWorksheet('Issues')

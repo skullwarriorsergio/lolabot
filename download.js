@@ -3,19 +3,15 @@ const { http, https } = require('follow-redirects')
 const fs = require("fs")
 
 function download(url, filePath)  {
-  const file = fs.createWriteStream(filePath);
+  const file = fs.createWriteStream(filePath,{flags: 'w'});
   const request = https.request(url, response => {
     response.pipe(file);
   });
   request.end();
+  file.on('finish', function(){
+    console.log('request finished downloading file');
+    file.close()
+  });
 }
 
-function timeoutExcelFamilyBussiness() {
-  setTimeout(function () {
-    download(process.env.excelfburl,process.env.excelfbfile)
-    if (!stoppingBot)
-      timeout();
-  }, 500000)
-}
-
-module.exports = { download, timeoutExcelFamilyBussiness }
+module.exports = { download }
