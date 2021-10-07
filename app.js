@@ -10,31 +10,37 @@ var options = [];
 var stoppingBot = false
 bot = new Telegraf(process.env.token)
 
-//  Execute the downloaders
-try {
-  download(process.env.excelfburl,process.env.excelfbfile)
-} catch (error) {
+//  download function
+function downloadFiles(){
+  try {
+    download(process.env.excelfburl,process.env.excelfbfile)
+  } catch (error) {
+  }
+  try {
+    download(process.env.excelaccounturl,process.env.excelaccountfile)
+  } catch (error) {
+  }
+  try {
+    download(process.env.excellvrurl,process.env.excellvrfile)
+  } catch (error) {
+  }
+  try {
+    download(process.env.excelmfsurl,process.env.excelmfsfile)
+  } catch (error) {
+  }
 }
-try {
-  download(process.env.excelaccounturl,process.env.excelaccountfile)
-} catch (error) {
-}
-//  Start the loop
+//  Loop function
 function downloadLoop(){
   setTimeout(function () {
-    try {
-      download(process.env.excelfburl,process.env.excelfbfile)
-    } catch (error) {
-    }
-    try {
-      download(process.env.excelaccounturl,process.env.excelaccountfile)
-    } catch (error) {
-    }
+    downloadFiles()
     if (!stoppingBot)
       downloadLoop();
     else console.log("Loop stopped")
   }, 400000) //400 000
 }
+
+//Execute download and start loop
+downloadFiles()
 downloadLoop()
 
 bot.telegram.getMe().then((botInfo) => {
@@ -49,6 +55,67 @@ bot.command("start", (ctx) => {
 })
 bot.command("lola", (ctx) => {
   Welcome(ctx)
+})
+bot.command("negativesLVR", (ctx) => {
+  fileExists(process.env.excellvrfile).then((result) => {  
+    if (!result)
+    {
+      ctx.replyWithHTML("Upss, el excel necesario no se encuentra, espere unos minutos a que se descargue o contacte con el desarrollador del bot.")
+      return;    
+    }
+    ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...")
+    .then(() =>{
+      bot.telegram.sendMessage(ctx.from.id,"Buscando <b>saldos negativos</b> en LVR. Espere por favor",{ parse_mode: 'HTML' }).then(() => {
+        workbook.xlsx.readFile(process.env.excellvrfile).catch((err) => {})
+        .then(function() { 
+          //iterar por cada pagina
+          workbook.eachSheet(function(worksheet, sheetId) {
+            //iterar por cada file
+            worksheet.eachRow(function(row, rowNumber) {
+              if ((String(row.getCell(2).value).toLowerCase() === 'negative' || String(row.getCell(2).value).toLowerCase() === 'negativo') && row.getCell(5).value === null){
+                bot.telegram.sendMessage(ctx.from.id,`• ${worksheet.name}    - <b>${row.getCell(4).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                }, 100))
+              }
+            })
+          })
+        })
+      })
+    })
+  })
+})
+bot.command("negativesMFS", (ctx) => {
+  fileExists(process.env.excelmfsfile).then((result) => {  
+    if (!result)
+    {
+      ctx.replyWithHTML("Upss, el excel necesario no se encuentra, espere unos minutos a que se descargue o contacte con el desarrollador del bot.")
+      return;    
+    }
+    ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...")
+    .then(() =>{
+      bot.telegram.sendMessage(ctx.from.id,"Buscando <b>saldos negativos</b> en MFS. Espere por favor",{ parse_mode: 'HTML' }).then(() => {
+        workbook.xlsx.readFile(process.env.excelmfsfile).catch((err) => {})
+        .then(function() { 
+          //iterar por cada pagina
+          workbook.eachSheet(function(worksheet, sheetId) {
+            //iterar por cada file
+            worksheet.eachRow(function(row, rowNumber) {
+              if ((String(row.getCell(2).value).toLowerCase() === 'negative' || String(row.getCell(2).value).toLowerCase() === 'negativo') && row.getCell(5).value === null){
+                bot.telegram.sendMessage(ctx.from.id,`• ${worksheet.name}    - <b>${row.getCell(4).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                }, 100))
+              }
+            })
+          })
+        })
+      })
+    })
+  })
+})
+//forzar actualizacion
+bot.command("update", (ctx) => {
+  ctx.reply("Actualizando excels desde Google Drive...")
+  .then(() =>{
+    downloadFiles()
+  }).then(ctx.reply("Actualización completada."))
 })
 //Ingresos pendientes
 bot.command("incomes", (ctx) => {
