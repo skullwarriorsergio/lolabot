@@ -56,7 +56,7 @@ bot.command("start", (ctx) => {
 bot.command("lola", (ctx) => {
   Welcome(ctx)
 })
-bot.command("negativesLVR", (ctx) => {
+bot.command("negativeslvr", (ctx) => {
   fileExists(process.env.excellvrfile).then((result) => {  
     if (!result)
     {
@@ -83,7 +83,7 @@ bot.command("negativesLVR", (ctx) => {
     })
   })
 })
-bot.command("negativesMFS", (ctx) => {
+bot.command("negativesmfs", (ctx) => {
   fileExists(process.env.excelmfsfile).then((result) => {  
     if (!result)
     {
