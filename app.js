@@ -9,6 +9,10 @@ var bot = null
 var options = [];
 var stoppingBot = false
 bot = new Telegraf(process.env.token)
+let dollarUSLocale = Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,      
+  maximumFractionDigits: 2,
+});
 
 //  download function
 function downloadFiles(){
@@ -65,7 +69,7 @@ bot.command("negativeslvr", (ctx) => {
     }
     ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...")
     .then(() =>{
-      bot.telegram.sendMessage(ctx.from.id,"Buscando <b>saldos negativos</b> en LVR. Espere por favor",{ parse_mode: 'HTML' }).then(() => {
+      bot.telegram.sendMessage(ctx.from.id,"Buscando <b>saldos negativos</b> en LVR. Espere por favor\nTenga en cuenta que si existen payrolls en revisión, los negativos que puedan surgir no se mostrarán hasta que se aprueben dichos payrolls",{ parse_mode: 'HTML' }).then(() => {
         workbook.xlsx.readFile(process.env.excellvrfile).catch((err) => {})
         .then(function() { 
           //iterar por cada pagina
@@ -73,7 +77,7 @@ bot.command("negativeslvr", (ctx) => {
             //iterar por cada file
             worksheet.eachRow(function(row, rowNumber) {
               if ((String(row.getCell(2).value).toLowerCase() === 'negative' || String(row.getCell(2).value).toLowerCase() === 'negativo') && row.getCell(5).value === null){
-                bot.telegram.sendMessage(ctx.from.id,`• ${worksheet.name}    - <b>${row.getCell(4).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                bot.telegram.sendMessage(ctx.from.id,`• ${worksheet.name}    - <b>$${dollarUSLocale.format(row.getCell(4).value)}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
                 }, 100))
               }
             })
@@ -92,7 +96,7 @@ bot.command("negativesmfs", (ctx) => {
     }
     ctx.replyWithHTML(ctx.chat.id != ctx.from.id ? `Hola <strong>${ctx.from.first_name}</strong>!\n` + "Le he enviado la respuesta a su consulta en un mensaje privado.\nNos vemos allí." : "Entendido, ejecutando comando...")
     .then(() =>{
-      bot.telegram.sendMessage(ctx.from.id,"Buscando <b>saldos negativos</b> en MFS. Espere por favor",{ parse_mode: 'HTML' }).then(() => {
+      bot.telegram.sendMessage(ctx.from.id,"Buscando <b>saldos negativos</b> en MFS. Espere por favor\nTenga en cuenta que si existen payrolls en revisión, los negativos que puedan surgir no se mostrarán hasta que se aprueben dichos payrolls",{ parse_mode: 'HTML' }).then(() => {
         workbook.xlsx.readFile(process.env.excelmfsfile).catch((err) => {})
         .then(function() { 
           //iterar por cada pagina
@@ -100,7 +104,7 @@ bot.command("negativesmfs", (ctx) => {
             //iterar por cada file
             worksheet.eachRow(function(row, rowNumber) {
               if ((String(row.getCell(2).value).toLowerCase() === 'negative' || String(row.getCell(2).value).toLowerCase() === 'negativo') && row.getCell(5).value === null){
-                bot.telegram.sendMessage(ctx.from.id,`• ${worksheet.name}    - <b>${row.getCell(4).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                bot.telegram.sendMessage(ctx.from.id,`• ${worksheet.name}    - <b>$${dollarUSLocale.format(row.getCell(4)).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
                 }, 100))
               }
             })
@@ -134,21 +138,21 @@ bot.command("incomes", (ctx) => {
             let worksheet = workbook.getWorksheet('Ingresos LVR')
             worksheet.eachRow(function(row, rowNumber) {
               if (row.getCell(3).value !== null && row.getCell(6).value === null){
-                bot.telegram.sendMessage(ctx.from.id,`• LVR • Deudor <b>${row.getCell(5).value}</b> monto: <b>${row.getCell(4).value}</b>\n referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                bot.telegram.sendMessage(ctx.from.id,`• LVR • Deudor <b>${row.getCell(5).value}</b> monto: <b>$${dollarUSLocale.format(row.getCell(4).value)}</b>\n referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
                 }, 100))
               }
             })
             let worksheet2 = workbook.getWorksheet('Ingresos MFS')
             worksheet2.eachRow(function(row, rowNumber) {
               if (row.getCell(3).value !== null && row.getCell(6).value === null){
-                bot.telegram.sendMessage(ctx.from.id,`• MFS • Deudor <b>${row.getCell(5).value}</b> monto: <b>${row.getCell(4).value}</b>\n referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                bot.telegram.sendMessage(ctx.from.id,`• MFS • Deudor <b>${row.getCell(5).value}</b> monto: <b>$${dollarUSLocale.format(row.getCell(4).value)}</b>\n referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
                 }, 100))
               }
             })
             let worksheet3 = workbook.getWorksheet('Ingresos HotShot')
             worksheet3.eachRow(function(row, rowNumber) {
               if (row.getCell(3).value !== null && row.getCell(6).value === null){
-                bot.telegram.sendMessage(ctx.from.id,`• Deudor <b>${row.getCell(5).value}</b> monto: <b>${row.getCell(4).value}</b>\n referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+                bot.telegram.sendMessage(ctx.from.id,`• Deudor <b>${row.getCell(5).value}</b> monto: <b>$${dollarUSLocale.format(row.getCell(4).value)}</b>\n referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
                 }, 100))
               }
             })  
@@ -180,7 +184,7 @@ bot.command("payments", (ctx) => {
           const worksheet = workbook.getWorksheet('Obligaciones de Pago')
           worksheet.eachRow(function(row, rowNumber) {
             if (row.getCell(3).value !== null && row.getCell(6).value === null){
-              bot.telegram.sendMessage(ctx.from.id,`• Pagar a <b>${row.getCell(4).value}</b> monto: <b>${row.getCell(5).value}</b>\n  referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
+              bot.telegram.sendMessage(ctx.from.id,`• Pagar a <b>${row.getCell(4).value}</b> monto: <b>$${dollarUSLocale.format(row.getCell(5).value)}</b>\n  referencia: <b>${row.getCell(8).value}</b>`,{ parse_mode: 'HTML' }).then(() => setTimeout(() => {
               }, 100))
             }
           })
@@ -259,7 +263,7 @@ bot.command("pending", (ctx) => {
             worksheet.eachRow(function(row, rowNumber) {
             if (row.getCell(1).value?.result == 'BOL recibido' && row.getCell(4).value !== null && row.getCell(5).value === null)
                 {
-                  bot.telegram.sendMessage(ctx.from.id,`• Carga: <b>${row.getCell(6)}</b> Broker: <b>${row.getCell(7)}</b> Camión: <b>${row.getCell(8)}</b> Linehaul: <b>${row.getCell(10)}</b>\n(<b>${row.getCell(11)} ==> <b>${row.getCell(13)}</b></b>)`,{ parse_mode: 'HTML' })
+                  bot.telegram.sendMessage(ctx.from.id,`• Carga: <b>${row.getCell(6)}</b> Broker: <b>${row.getCell(7)}</b> Camión: <b>${row.getCell(8)}</b> Linehaul: <b>$${dollarUSLocale.format(row.getCell(10))}</b>\n(<b>${row.getCell(11)} ==> <b>${row.getCell(13)}</b></b>)`,{ parse_mode: 'HTML' })
                   .then(() => setTimeout(() => {
                   
                   }, 100))
